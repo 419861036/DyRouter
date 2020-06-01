@@ -2,3 +2,4 @@
 *.css linguist-language=HTML
 *.html linguist-language=HTML
 *.go linguist-language=GO
+*.java linguist-language=JAVA
