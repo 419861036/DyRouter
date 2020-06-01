@@ -18,7 +18,3 @@ DyRouter.iml
 # vendor/
 
 pkg/
-src/com/config/
-src/com/db/
-src/com/dispacth/
-src/com/utils/
