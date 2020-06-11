@@ -1,26 +1,26 @@
 package http
 
 import (
+	"../config"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
+	"net/http/httputil"
+	"net/url"
 )
 
-func SendData(r *http.Request) []byte {
-	client := &http.Client{}
-	fmt.Println(r.URL.Path)
-	req, err := http.NewRequest(r.Method, "http://www.baidu.com", strings.NewReader(""))
+func SendData(r *http.Request, w http.ResponseWriter) {
+	fmt.Printf("Received request %s %s %s %s\n", r.Method, r.Host, r.RemoteAddr, r.URL.String())
+	servers := config.GLOBAL_CONFIG.Servers[0]
+	remote, err := url.Parse(servers.Location)
 	if err != nil {
-		// handle error
+		panic(err)
 	}
-	fmt.Println(r.Method)
 
-	resp, err := client.Do(req)
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		// handle error
+	proxy := httputil.NewSingleHostReverseProxy(remote)
+	proxy.ModifyResponse = func(response *http.Response) error {
+		response.Header.Add("good", "11")
+		return nil
 	}
-	return body
+	proxy.ServeHTTP(w, r)
+
 }

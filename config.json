@@ -1,0 +1,10 @@
+{
+  "port": 80,
+  "servers":[ {
+      "location":"http://172.16.1.84"
+    },
+    {
+      "location":"http://172.16.1.81"
+    }
+  ]
+}
