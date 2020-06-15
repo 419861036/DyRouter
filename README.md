@@ -38,7 +38,65 @@ DyRouter 一个基于go的动态路由服务
 ```
 
 
-
+## 路由表信息新版
+```
+{
+	 "//服务器编码":"",
+	 "server1":{
+		"hostName":"baidu.com",
+		"port":8185,
+		"dyRouters":{
+			"//服务器编码":"",
+			"code":"/api/bp",
+			"//path 路径":"",
+			"path":"/api/bp",
+			"proxy_pass":[
+				{
+					"//type 协议":"",
+					"type":"http,websokect", 
+					"proxy":"http://172.16.1.84",
+					"//公共扩展参数 系统内置功能需要的参数 根据情况扩展":"",
+					"params":{
+						"weight":1,
+						"allowIp非必填":"",
+						"allowIp":"127.0.0.1,127.0.0.2",
+						"forbidIp非必填":"",
+						"forbidIp":"192.168.0.4"
+					},
+					"//初始化":"",
+					"eventInit":[
+						{
+							"//语言支持 lua js":"",
+							"lang":"lua",
+							"script":"内容",
+							"scriptFile":"脚本文件路径",
+							"params":"@see proxy_pass/params"
+						}
+					],
+					"//请求之前":"",
+					"eventReqBefore":[
+						{
+							"所有事件格式一致":""
+						}
+					],
+					"//请求之后":"",
+					"eventReqAfter":[
+						{
+							"所有事件格式一致":""
+						}
+					]
+					
+				}
+			]
+		}
+	},
+	"serverN":{
+		"//说明: @see server1 多个server":""
+	}
+	
+	
+}
+```
 ## 路由表信息
 ```
 [
