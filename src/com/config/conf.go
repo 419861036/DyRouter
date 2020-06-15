@@ -3,19 +3,34 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/yuin/gopher-lua"
+	"log"
 	"os"
+	"strconv"
 )
 
 var GLOBAL_CONFIG *Config
-
 var conf_file = "config.json"
 
+type Proxy struct {
+	Location    string
+	Path        []string
+	BeforeEvent string
+	AfterEvent  string
+}
 type Server struct {
-	Location string
+	Port       int
+	Proxys     []Proxy
+	InitEvent  string
+	Name       string
+	ScriptPath string
 }
 type Config struct {
-	Port    int
-	Servers []Server
+	Hostname   string
+	Logfile    string
+	Servers    []Server
+	ScriptPath string
+	InitEvent  string
 }
 
 func init() {
@@ -30,10 +45,27 @@ func init() {
 	decoder := json.NewDecoder(filePtr)
 	err = decoder.Decode(&config)
 	if err != nil {
-		fmt.Println("Decoder failed", err.Error())
+		log.Println("Decoder failed " + err.Error())
 	} else {
-		fmt.Println("Decoder success")
-		fmt.Println(config.Port)
+		log.Println(config)
 	}
 	GLOBAL_CONFIG = &config
+	HandlerLua(config.InitEvent, config.ScriptPath)
+	log.Println("当前进程：" + strconv.Itoa(os.Getpid()))
+}
+
+func HandlerLua(function string, path string) {
+	if !(len(function) > 0 && len(path) > 0) {
+		return
+	}
+	//加载lua引擎
+	L := lua.NewState()
+	L.OpenLibs()
+	defer L.Close()
+	L.DoFile(path)
+	//L.DoString("GetStr()")
+	fn := L.GetGlobal(function)
+	if err := L.CallByParam(lua.P{Fn: fn, NRet: 1, Protect: true}, nil); err != nil {
+		panic(err)
+	}
 }

@@ -1,10 +1,47 @@
 {
-  "port": 80,
-  "servers":[ {
-      "location":"http://172.16.1.84"
+  "hostname": "proxy",
+  "logfile": "",
+  "initEvent": "GetApplication",
+  "scriptPath":"test.lua",
+  "servers":[
+      {
+        "port": 80,
+        "initEvent": "GetServer",
+        "name": "server1",
+        "scriptPath":"test.lua",
+        "proxys":[ {
+            "location":"cig/bp",
+            "path":["http://www.baidu.com"],
+            "beforeEvent": "",
+            "afterEvent": ""
+            },
+            {
+              "location":"cig/bp",
+              "path":[],
+              "beforeEvent": "",
+              "afterEvent": ""
+            }
+        ]
     },
     {
-      "location":"http://172.16.1.81"
+      "port": 8080,
+      "initEvent": "",
+      "name": "server2",
+      "scriptPath":"",
+      "proxys":[
+        {
+          "location":"cig/bp",
+          "path":[],
+          "beforeEvent": "",
+          "afterEvent": ""
+        },
+        {
+        "location":"cig/bp",
+        "path":[],
+        "beforeEvent": "",
+        "afterEvent": ""
+        }
+      ]
     }
   ]
 }

@@ -2,7 +2,8 @@ package http
 
 import (
 	"../config"
-	"fmt"
+	"../core"
+	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -13,18 +14,19 @@ var wg1 sync.WaitGroup
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// filter request header
-	SendData(r, w)
-	//filter repsonse header
-
-	//fmt.Fprintln(w, string(body))
-
+	core.Handdler(w, r)
 }
 
 func init() {
-	port := strconv.Itoa(config.GLOBAL_CONFIG.Port)
-	fmt.Println("开启代理服务器：" + port)
 	http.HandleFunc("/", IndexHandler)
-	http.ListenAndServe("127.0.0.1:"+port, nil)
+	for _, server := range config.GLOBAL_CONFIG.Servers {
+		go func(server config.Server) {
+			p := strconv.Itoa(server.Port)
+			log.Println("开启代理服务器成功,端口：" + p)
+
+			http.ListenAndServe(":"+p, nil)
+		}(server)
+	}
 
 }
 func Handler(wg *sync.WaitGroup) {
