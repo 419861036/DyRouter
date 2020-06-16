@@ -2,7 +2,6 @@ package core
 
 import (
 	"../config"
-	"fmt"
 	lua "github.com/yuin/gopher-lua"
 	"math/rand"
 	"net"
@@ -93,15 +92,51 @@ func Handdler(w http.ResponseWriter, r *http.Request) {
 
 // 导出对象
 var exports = map[string]lua.LGFunction{
-	"request":  request,
-	"response": response,
+	"get_req_header": get_req_header,
+	"add_req_header": add_req_header,
+	"del_req_header": del_req_header,
+	"get_res_header": get_res_header,
+	"add_res_header": add_res_header,
+	"del_res_header": del_res_header,
+	"redirect":       redirect,
 }
 
-func request(L *lua.LState) int {
-	fmt.Println(req)
+func get_req_header(L *lua.LState) int {
+	key := L.ToString(1)
+	val := req.Header.Get(key)
+	L.Push(lua.LString(val))
+	return 1
+}
+func add_req_header(L *lua.LState) int {
+	key := L.ToString(1)
+	val := L.ToString(2)
+	req.Header.Add(key, val)
 	return 0
 }
-func response(L *lua.LState) int {
-	res.Header().Add("aaa", "11")
+func del_req_header(L *lua.LState) int {
+	key := L.ToString(1)
+	req.Header.Del(key)
+	return 0
+}
+func get_res_header(L *lua.LState) int {
+	key := L.ToString(1)
+	val := res.Header().Get(key)
+	L.Push(lua.LString(val))
+	return 1
+}
+func add_res_header(L *lua.LState) int {
+	key := L.ToString(1)
+	val := L.ToString(2)
+	res.Header().Add(key, val)
+	return 0
+}
+func del_res_header(L *lua.LState) int {
+	key := L.ToString(1)
+	res.Header().Del(key)
+	return 0
+}
+func redirect(L *lua.LState) int {
+	path := L.ToString(1)
+	http.Redirect(res, req, path, http.StatusTemporaryRedirect)
 	return 0
 }
