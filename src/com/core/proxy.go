@@ -7,13 +7,13 @@ import (
 )
 
 type Dispath interface {
-	Handler(r *http.Request, w http.ResponseWriter)
+	Handler(r *http.Request, w http.ResponseWriter, fn func(*http.Request, http.ResponseWriter))
 }
 
 type Proxy struct {
 }
 
-func (p Proxy) Handler(r *http.Request, w http.ResponseWriter) {
+func (p Proxy) Handler(r *http.Request, w http.ResponseWriter, fn func(*http.Request, http.ResponseWriter)) {
 	fmt.Printf("Received request %s %s %s %s\n", r.Method, r.Host, r.RemoteAddr, r.URL.String())
 	transport := http.DefaultTransport
 	res, err := transport.RoundTrip(r)
@@ -22,7 +22,7 @@ func (p Proxy) Handler(r *http.Request, w http.ResponseWriter) {
 		return
 	}
 	if res.StatusCode == http.StatusForbidden || res.StatusCode == http.StatusInternalServerError {
-		HttpProxy{}.Handler(r, w)
+		HttpProxy{}.Handler(r, w, fn)
 		return
 	}
 
@@ -32,7 +32,9 @@ func (p Proxy) Handler(r *http.Request, w http.ResponseWriter) {
 			w.Header().Add(key, v)
 		}
 	}
+	fn(r, w)
 	w.WriteHeader(res.StatusCode)
+
 	io.Copy(w, res.Body)
 	res.Body.Close()
 	/*proxy := httputil.NewSingleHostReverseProxy(remote)
@@ -46,10 +48,12 @@ func (p Proxy) Handler(r *http.Request, w http.ResponseWriter) {
 type HttpProxy struct {
 }
 
-func (p HttpProxy) Handler(r *http.Request, w http.ResponseWriter) {
+func (p HttpProxy) Handler(r *http.Request, w http.ResponseWriter, fn func(*http.Request, http.ResponseWriter)) {
 	client := &http.Client{}
 	req, _ := http.NewRequest(r.Method, r.URL.Scheme+"://"+r.URL.Host+r.URL.Path, nil)
 	resp, _ := client.Do(req)
+	//回调
+	fn(r, w)
 	w.WriteHeader(resp.StatusCode)
 	io.Copy(w, resp.Body)
 	resp.Body.Close()
@@ -58,6 +62,6 @@ func (p HttpProxy) Handler(r *http.Request, w http.ResponseWriter) {
 type StreamProxy struct {
 }
 
-func (s StreamProxy) Handler(r *http.Request, w http.ResponseWriter) {
+func (s StreamProxy) Handler(r *http.Request, w http.ResponseWriter, fn func(*http.Request, http.ResponseWriter)) {
 
 }

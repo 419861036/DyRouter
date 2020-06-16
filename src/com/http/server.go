@@ -14,6 +14,7 @@ var wg1 sync.WaitGroup
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// filter request header
+
 	core.Handdler(w, r)
 }
 
@@ -26,6 +27,7 @@ func init() {
 
 			http.ListenAndServe(":"+p, nil)
 		}(server)
+
 	}
 
 }

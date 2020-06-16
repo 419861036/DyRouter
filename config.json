@@ -5,18 +5,18 @@
   "scriptPath":"test.lua",
   "servers":[
       {
-        "port": 80,
+        "port": 82,
         "initEvent": "GetServer",
         "name": "server1",
         "scriptPath":"test.lua",
         "proxys":[ {
-            "location":"cig/bp",
-            "path":["http://www.baidu.com"],
-            "beforeEvent": "",
+            "location":"cgi/bp",
+            "path":["http://www.baidu.com","http://172.16.1.81","http://172.16.1.84"],
+            "beforeEvent": "GetStr",
             "afterEvent": ""
             },
             {
-              "location":"cig/bp",
+              "location":"cgi",
               "path":[],
               "beforeEvent": "",
               "afterEvent": ""
@@ -30,13 +30,13 @@
       "scriptPath":"",
       "proxys":[
         {
-          "location":"cig/bp",
+          "location":"cig1/bp",
           "path":[],
           "beforeEvent": "",
           "afterEvent": ""
         },
         {
-        "location":"cig/bp",
+        "location":"cig2/bp",
         "path":[],
         "beforeEvent": "",
         "afterEvent": ""
