@@ -77,8 +77,9 @@ func init() {
 	}
 	GLOBAL_CONFIG = &config
 	LUA = &LuaHandler{lua.NewState()}
-	LUA.HandlerLua(config.InitEvent, config.ScriptPath)
+	LUA.L.OpenLibs()
 
+	LUA.HandlerLua(config.InitEvent, config.ScriptPath)
 	log.Println("当前进程：" + strconv.Itoa(os.Getpid()))
 }
 
@@ -89,6 +90,7 @@ func (l *LuaHandler) HandlerLua(function string, path string) {
 	//加载lua引擎
 	l.L.DoFile(path)
 	//L.DoString("GetStr()")
+	//事件回调
 	fn := l.L.GetGlobal(function)
 	if err := l.L.CallByParam(lua.P{Fn: fn, NRet: 1, Protect: true}, nil); err != nil {
 		panic(err)

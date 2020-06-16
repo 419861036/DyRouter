@@ -13,7 +13,7 @@
             "location":"cgi/bp",
             "path":["http://www.baidu.com","http://172.16.1.81","http://172.16.1.84"],
             "beforeEvent": "GetStr",
-            "afterEvent": ""
+            "afterEvent": "GetStr1"
             },
             {
               "location":"cgi",

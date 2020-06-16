@@ -2,6 +2,7 @@ package core
 
 import (
 	"../config"
+	"fmt"
 	lua "github.com/yuin/gopher-lua"
 	"math/rand"
 	"net"
@@ -32,6 +33,9 @@ type match struct {
 	beforeEvent string
 	afterEvent  string
 }
+
+var req *http.Request
+var res http.ResponseWriter
 
 func Handdler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -75,9 +79,29 @@ func Handdler(w http.ResponseWriter, r *http.Request) {
 	d := SchemeMap[r.URL.Scheme]
 	//处理请求之前的事件
 	config.LUA.L.SetGlobal("m", lua.LString("1"))
+	//这里就可以加载mymodule模块
+	req = r
+	res = w
+	config.LUA.L.RegisterModule("dr", exports)
 	config.LUA.HandlerLua(bestMatch.beforeEvent, server.ScriptPath)
 	d.Handler(r, w, func(request *http.Request, writer http.ResponseWriter) {
 		writer.Header().Add("goof", "111")
 		config.LUA.HandlerLua(bestMatch.afterEvent, server.ScriptPath)
 	})
+
+}
+
+// 导出对象
+var exports = map[string]lua.LGFunction{
+	"request":  request,
+	"response": response,
+}
+
+func request(L *lua.LState) int {
+	fmt.Println(req)
+	return 0
+}
+func response(L *lua.LState) int {
+	res.Header().Add("aaa", "11")
+	return 0
 }
