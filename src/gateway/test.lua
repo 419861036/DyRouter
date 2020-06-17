@@ -16,7 +16,7 @@ end
      local http = require("http")
 function GetApplication()
     response, error = http.request("get", "http://www.baidu.com")
-    print(response['body'])
+    g.g_add_proxy("/12","http://www.baidu.com")
     print("Application")
 end
 
@@ -38,7 +38,6 @@ function MoreReturn(a)
 end
 --0返回值0参数
 function GetStr()
-       dr.close(502)
     --dr.redirect("http://www.baidu.com")
     print(dr)
 end

@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,7 +20,7 @@ var GLOBAL_CONFIG *Config
 var conf_file = "../../config.json"
 var Host_port map[string]Server
 var LUA *LuaHandler
-
+var D_proxy map[string]Proxy
 type Proxy struct {
 	Location    string
 	Path        []string
@@ -80,6 +81,8 @@ func init() {
 	}
 	GLOBAL_CONFIG = &config
 	LUA = &LuaHandler{lua.NewState()}
+	D_proxy =make(map[string]Proxy)
+	LUA.L.RegisterModule("g",exports)
 	//debug
 	lua_debugger.Preload(LUA.L)
 	//http
@@ -103,4 +106,15 @@ func (l *LuaHandler) HandlerLua(function string, path string) {
 	if err := l.L.CallByParam(lua.P{Fn: fn, NRet: 1, Protect: true}, nil); err != nil {
 		panic(err)
 	}
+}
+func add_d_proxy(L *lua.LState)  int{
+	location:=L.ToString(1)
+	path:=strings.Split(L.ToString(2),",")
+	D_proxy[location]=Proxy{location,path,"",""}
+	return 0
+}
+
+// 导出对象
+var exports = map[string]lua.LGFunction{
+	"g_add_proxy":add_d_proxy,
 }

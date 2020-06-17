@@ -60,8 +60,20 @@ func Handdler(w http.ResponseWriter, r *http.Request) {
 	}
 	bestMatch := bMatch
 	if reflect.DeepEqual(bMatch, match{}) {
-		bestMatch = lMatch
+		for k,v:= range config.D_proxy{
+			match, _ := regexp.MatchString(r.URL.Path, k)
+			if match {
+				bMatch.path = v.Path
+				bMatch.beforeEvent = v.BeforeEvent
+				bMatch.afterEvent = v.AfterEvent
+			}
+		}
+		bestMatch= bMatch
+		if reflect.DeepEqual(bMatch, match{}){
+			bestMatch = lMatch
+		}
 	}
+
 	if len(bestMatch.path) <= 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
