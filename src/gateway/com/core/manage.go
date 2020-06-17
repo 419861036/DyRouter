@@ -1,7 +1,7 @@
 package core
 
 import (
-	"../config"
+	"gateway/com/config"
 	lua "github.com/yuin/gopher-lua"
 	"math/rand"
 	"net"
@@ -35,7 +35,7 @@ type match struct {
 
 var req *http.Request
 var res http.ResponseWriter
-
+var Close bool=false
 func Handdler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	addrs := ctx.Value("local-addr").(*net.TCPAddr)
@@ -83,6 +83,11 @@ func Handdler(w http.ResponseWriter, r *http.Request) {
 	res = w
 	config.LUA.L.RegisterModule("dr", exports)
 	config.LUA.HandlerLua(bestMatch.beforeEvent, server.ScriptPath)
+	//返回请求
+	if Close {
+		return
+	}
+
 	d.Handler(r, w, func(request *http.Request, writer http.ResponseWriter) {
 		writer.Header().Add("goof", "111")
 		config.LUA.HandlerLua(bestMatch.afterEvent, server.ScriptPath)
@@ -99,6 +104,7 @@ var exports = map[string]lua.LGFunction{
 	"add_res_header": add_res_header,
 	"del_res_header": del_res_header,
 	"redirect":       redirect,
+	"close": res_close,
 }
 
 func get_req_header(L *lua.LState) int {
@@ -134,6 +140,12 @@ func del_res_header(L *lua.LState) int {
 	key := L.ToString(1)
 	res.Header().Del(key)
 	return 0
+}
+func res_close(L *lua.LState) int {
+	state := L.ToInt(1)
+	res.WriteHeader(state)
+	Close = true
+	return  0
 }
 func redirect(L *lua.LState) int {
 	path := L.ToString(1)

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./com/http"
+	"gateway/com/http"
 	"sync"
 )
 

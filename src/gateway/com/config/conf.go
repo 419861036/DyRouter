@@ -2,7 +2,10 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/edolphin-ydf/gopherlua-debugger"
+	"github.com/cjoudrey/gluahttp"
 	"github.com/yuin/gopher-lua"
+	luajson  "gateway/com/utils/json"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,7 +16,7 @@ import (
 )
 
 var GLOBAL_CONFIG *Config
-var conf_file = "config.json"
+var conf_file = "../../config.json"
 var Host_port map[string]Server
 var LUA *LuaHandler
 
@@ -77,7 +80,12 @@ func init() {
 	}
 	GLOBAL_CONFIG = &config
 	LUA = &LuaHandler{lua.NewState()}
-	LUA.L.OpenLibs()
+	//debug
+	lua_debugger.Preload(LUA.L)
+	//http
+	LUA.L.PreloadModule("http", gluahttp.NewHttpModule(&http.Client{}).Loader)
+	//json
+	luajson.Preload(LUA.L)
 
 	LUA.HandlerLua(config.InitEvent, config.ScriptPath)
 	log.Println("当前进程：" + strconv.Itoa(os.Getpid()))

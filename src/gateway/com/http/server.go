@@ -1,8 +1,8 @@
 package http
 
 import (
-	"../config"
-	"../core"
+	"gateway/com/config"
+	"gateway/com/core"
 	"log"
 	"net/http"
 	"strconv"
