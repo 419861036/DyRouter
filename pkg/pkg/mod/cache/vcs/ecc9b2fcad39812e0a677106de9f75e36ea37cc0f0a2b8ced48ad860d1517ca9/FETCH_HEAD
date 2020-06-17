@@ -1,0 +1,4 @@
+91694c92e18405dc2cd309342223ee18febc7a01		branch '5.3' of https://github.com/yuin/gopher-lua
+48de30d01168ff9d29b2b29010bd12d8a0255052		branch 'feature-dump-func' of https://github.com/yuin/gopher-lua
+571b031ebefafde258037fa84fc1ff6c6f12227b		branch 'feature-exp-go1.8plugins' of https://github.com/yuin/gopher-lua
+dc2b0ca8b37e41ab0494be94fc6d8febbeb29d34		branch 'master' of https://github.com/yuin/gopher-lua
